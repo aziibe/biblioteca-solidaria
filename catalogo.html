@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Biblioteca Solidária - Catálogo</title>
-  <link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="css/catalogo.css" />
 </head>
-<body>
 
+<body>
   <header>
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
@@ -15,7 +16,6 @@
       <a href="minhas.html">Minhas Solicitações</a>
       <a href="doar.html">Doar livro</a>
       <a href="usuario.html">perfil</a>
-
     </nav>
   </header>
 
@@ -25,99 +25,114 @@
       <label for="filtro-genero">Filtrar por Gênero:</label>
       <select id="filtro-genero">
         <option value="">Todos</option>
-        <option value="ficcao">Ficção</option>
-        <option value="nao-ficcao">Não Ficção</option>
-        <option value="aventura">Aventura</option>
+        <option value="science_fiction">Ficção-Científica</option>
+        <option value="non_fiction">Não-Ficção</option>
+        <option value="adventure">Aventura</option>
         <option value="romance">Romance</option>
-        <option value="misterios">Mistérios</option>
-        <option value="ficcao-cientifica">Ficção Científica</option>
-        <option value="Infantil">Infantil</option>
+        <option value="horror">Horror</option>
+        <option value="fantasy">Fantasia</option>
       </select>
-    
+
       <label for="filtro-etaria">Filtrar por Faixa Etária:</label>
       <select id="filtro-etaria">
         <option value="">Todas</option>
-        <option value="livre">livre</option>
-        <option value="10+">10+</option>
-        <option value="13+">13+</option>
-        <option value="16+">16+</option>
-        <option value="18+">18+</option>
+        <option value="all_ages">livre</option>
+        <option value="10_and_up">10+</option>
+        <option value="13_and_up">13+</option>
+        <option value="16_and_up">16+</option>
+        <option value="18_and_up">18+</option>
       </select>
     </div>
-    
+
     <div id="livros-container">
-      <div class="book-card" data-genero="romance" data-etaria="16+">
-        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
-        <p><strong>Título:</strong> ....<br></p>
-        <p><strong>Autor:</strong> .....<br></p>
-        <p><strong>genero:</strong> Romance<br></p>
-        <p><strong>faixa etaria:</strong> +16<br></p>
-        <p><strong>Status:</strong> Disponível</p>
-        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
-        </div>
-         </div>
-
-      <div class="book-card" data-genero="aventura" data-etaria="13+">
-        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
-        <p><strong>Título:</strong> ....<br></p>
-        <p><strong>Autor:</strong> .....<br></p>
-        <p><strong>genero:</strong> aventura<br></p>
-        <p><strong>faixa etaria:</strong>+13<br></p>
-        <p><strong>Status:</strong> Disponível</p>
-        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
-        </div>
-
-      </div>
-      <div class="book-card" data-genero="Ficção" data-etaria="+10">
-        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
-        <p><strong>Título:</strong> ....<br></p>
-        <p><strong>Autor:</strong> .....<br></p>
-        <p><strong>genero:</strong>ficção<br></p>
-        <p><strong>faixa etaria:</strong>+10<br></p>
-        <p><strong>Status:</strong> Disponível</p>
-        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
-        </div>
-
-      </div>
-      <div class="book-card" data-genero="Infantil" data-etaria="livre">
-        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
-        <p><strong>Título:</strong> ....<br></p>
-        <p><strong>Autor:</strong> .....<br></p>
-        <p><strong>genero:</strong>Infantil<br></p>
-        <p><strong>faixa etaria:</strong>livre<br></p>
-        <p><strong>Status:</strong> Disponível</p>
-        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
-        </div>
-
-      </div>
+      <!-- Os livros serão inseridos aqui dinamicamente -->
     </div>
   </main>
-  
+
   <script>
     const generoSelect = document.getElementById("filtro-genero");
     const etariaSelect = document.getElementById("filtro-etaria");
-    const livros = document.querySelectorAll(".book-card");
-  
+
+    const categoriasTraduzidas = {
+      fantasy: "Fantasia",
+      non_fiction: "Não-ficção",
+      adventure: "Aventura",
+      romance: "Romance",
+      horror: "Horror",
+      science_fiction: "Ficção científica",
+    };
+
+    const classificacoesTraduzidas = {
+      "18_and_up": "18+",
+      "16_and_up": "16+",
+      "13_and_up": "13+",
+      "10_and_up": "10+",
+      all_ages: "Livre",
+    };
+
     function filtrarLivros() {
       const genero = generoSelect.value;
       const etaria = etariaSelect.value;
-  
-      livros.forEach(livro => {
+      const livros = document.querySelectorAll(".book-card");
+
+      livros.forEach((livro) => {
         const generoLivro = livro.dataset.genero || "";
         const faixaEtariaLivro = livro.dataset.etaria || "";
-  
+
         const generoCond = genero === "" || genero === generoLivro;
         const etariaCond = etaria === "" || etaria === faixaEtariaLivro;
-  
-        livro.style.display = (generoCond && etariaCond) ? "flex" : "none";
+
+        livro.style.display = generoCond && etariaCond ? "flex" : "none";
       });
     }
-  
+
     generoSelect.addEventListener("change", filtrarLivros);
     etariaSelect.addEventListener("change", filtrarLivros);
+
+    async function carregarLivros() {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/books/catalog"
+        );
+        const livros = await response.json();
+        const livrosContainer = document.getElementById("livros-container");
+        console.log(livros);
+
+        if (livrosContainer) {
+          livrosContainer.innerHTML = "";
+
+          livros.forEach((livro) => {
+            const livroCard = document.createElement("div");
+            livroCard.classList.add("book-card");
+            livroCard.dataset.genero = livro.category;
+            livroCard.dataset.etaria = livro.classification;
+
+            const categoriaTraduzida =
+              categoriasTraduzidas[livro.category] || livro.category;
+            const classificacaoTraduzida =
+              classificacoesTraduzidas[livro.classification] ||
+              livro.classification;
+
+            livroCard.innerHTML = `
+              <img src="img/livro.png" alt="Capa do livro" class="book-img">
+              <div class="book-info">
+              <p><strong>Título:</strong> ${livro.title}</p> <!-- Atualizando para 'title' -->
+              <p><strong>Autor:</strong> ${livro.author}</p> <!-- Atualizando para 'author' -->
+              <p><strong>Gênero:</strong>  ${categoriaTraduzida}</p> <!-- Atualizando para 'category' -->
+              <p><strong>Classificação:</strong> ${classificacaoTraduzida}</p> <!-- Atualizando para 'classification' -->
+              <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"}</p> <!-- Traduzindo status -->
+              <a href="detalhes-livros.html" class="edit-button">Solicitar</a>
+              </div>`;
+            livrosContainer.appendChild(livroCard);
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao carregar livros:", error);
+      }
+    }
+
+    window.onload = carregarLivros;
   </script>
-  
 </body>
 
-  
 </html>
