@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Perfil - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/editarperfil.css" />
+</head>
+<body>
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+      <a href="index.html">Catálogo</a>
+      <a href="minhas.html">Minhas Solicitações</a>
+      <a href="doar.html">Doar Livro</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>✍️ Editar Perfil</h2>
+
+    <section class="form-container">
+      <form action="#" method="POST" id="editar-form">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" value="Fulano da Silva" required />
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" value="fulano@email.com" required />
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" value="senha123" required />
+
+        <label for="telefone">Telefone:</label>
+        <input type="number" id="telefone" name="telefone" value="14999999999" required />
+
+        <label for="endereco">Endereço:</label>
+        <input type="text" id="endereco" name="endereco" value="Rua Exemplo, 123 - Cidade, CEP 12345-678" required />
+
+        <button type="submit">Salvar Alterações</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doar Livro - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/doar.css">
+</head>
+<body>
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+        <a href="index.html">Catálogo</a>
+        <a href="minhas.html">Minhas Solicitações</a>
+        <a href="usuario.html">Perfil</a>
+      </nav>
+  </header>
+
+  <main>
+    <h1>Adicionar/Editar Livro</h1>
+  <form id="livro-form">
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" required />
+
+    <label for="autor">Autor:</label>
+    <input type="text" id="autor" required />
+
+    <label for="descricao">Descrição:</label>
+    <textarea id="descricao" rows="4" required></textarea>
+
+    <label for="categoria">Categoria:</label>
+    <select id="categoria" required>
+      <option value="">Selecione uma categoria</option>
+      <option value="ficcao">Ficção</option>
+      <option value="nao-ficcao">Não Ficção</option>
+      <option value="aventura">Aventura</option>
+      <option value="romance">Romance</option>
+      <option value="mistérios">Mistérios</option>
+      <option value="ficcao-cientifica">Ficção Científica</option>
+    </select>
+
+    <label for="classificacao">Classificação de Faixa Etária:</label>
+    <select id="classificacao" required>
+      <option value="">Selecione uma classificação</option>
+      <option value="10+">10+</option>
+      <option value="13+">13+</option>
+      <option value="16+">16+</option>
+      <option value="18+">18+</option>
+    </select>
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <script>
+    document.getElementById('livro-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      // Aqui você pode adicionar a lógica para salvar o livro
+      alert('Livro salvo com sucesso!');
+      // Limpar o formulário após salvar
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>

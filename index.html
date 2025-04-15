@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca Solidária - Catálogo</title>
+  <link rel="stylesheet" href="css/index.css" />
+</head>
+<body>
+
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+      <a href="login.html">Login/Cadastro</a>
+      <a href="minhas.html">Minhas Solicitações</a>
+      <a href="doar.html">Doar livro</a>
+      <a href="usuario.html">perfil</a>
+
+    </nav>
+  </header>
+
+  <main>
+    <h2>Catálogo de Livros Disponíveis</h2>
+    <div class="filtros">
+      <label for="filtro-genero">Filtrar por Gênero:</label>
+      <select id="filtro-genero">
+        <option value="">Todos</option>
+        <option value="ficcao">Ficção</option>
+        <option value="nao-ficcao">Não Ficção</option>
+        <option value="aventura">Aventura</option>
+        <option value="romance">Romance</option>
+        <option value="misterios">Mistérios</option>
+        <option value="ficcao-cientifica">Ficção Científica</option>
+        <option value="Infantil">Infantil</option>
+      </select>
+    
+      <label for="filtro-etaria">Filtrar por Faixa Etária:</label>
+      <select id="filtro-etaria">
+        <option value="">Todas</option>
+        <option value="livre">livre</option>
+        <option value="10+">10+</option>
+        <option value="13+">13+</option>
+        <option value="16+">16+</option>
+        <option value="18+">18+</option>
+      </select>
+    </div>
+    
+    <div id="livros-container">
+      <div class="book-card" data-genero="romance" data-etaria="16+">
+        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
+        <p><strong>Título:</strong> ....<br></p>
+        <p><strong>Autor:</strong> .....<br></p>
+        <p><strong>genero:</strong> Romance<br></p>
+        <p><strong>faixa etaria:</strong> +16<br></p>
+        <p><strong>Status:</strong> Disponível</p>
+        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
+        </div>
+         </div>
+
+      <div class="book-card" data-genero="aventura" data-etaria="13+">
+        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
+        <p><strong>Título:</strong> ....<br></p>
+        <p><strong>Autor:</strong> .....<br></p>
+        <p><strong>genero:</strong> aventura<br></p>
+        <p><strong>faixa etaria:</strong>+13<br></p>
+        <p><strong>Status:</strong> Disponível</p>
+        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
+        </div>
+
+      </div>
+      <div class="book-card" data-genero="Ficção" data-etaria="+10">
+        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
+        <p><strong>Título:</strong> ....<br></p>
+        <p><strong>Autor:</strong> .....<br></p>
+        <p><strong>genero:</strong>ficção<br></p>
+        <p><strong>faixa etaria:</strong>+10<br></p>
+        <p><strong>Status:</strong> Disponível</p>
+        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
+        </div>
+
+      </div>
+      <div class="book-card" data-genero="Infantil" data-etaria="livre">
+        <img src="img/livro.png" alt="Capa do livro" class="book-img">        <div class="book-info">
+        <p><strong>Título:</strong> ....<br></p>
+        <p><strong>Autor:</strong> .....<br></p>
+        <p><strong>genero:</strong>Infantil<br></p>
+        <p><strong>faixa etaria:</strong>livre<br></p>
+        <p><strong>Status:</strong> Disponível</p>
+        <a href="Detalhes-do-livro.html" class="edit-button">Solicitar</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    const generoSelect = document.getElementById("filtro-genero");
+    const etariaSelect = document.getElementById("filtro-etaria");
+    const livros = document.querySelectorAll(".book-card");
+  
+    function filtrarLivros() {
+      const genero = generoSelect.value;
+      const etaria = etariaSelect.value;
+  
+      livros.forEach(livro => {
+        const generoLivro = livro.dataset.genero || "";
+        const faixaEtariaLivro = livro.dataset.etaria || "";
+  
+        const generoCond = genero === "" || genero === generoLivro;
+        const etariaCond = etaria === "" || etaria === faixaEtariaLivro;
+  
+        livro.style.display = (generoCond && etariaCond) ? "flex" : "none";
+      });
+    }
+  
+    generoSelect.addEventListener("change", filtrarLivros);
+    etariaSelect.addEventListener("change", filtrarLivros);
+  </script>
+  
+</body>
+
+  
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minhas Solicitações - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/minhas.css"/>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Catálogo</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Minhas Solicitações</h2>
+
+    <div class="book-card aprovado">
+      <strong>Título:</strong> <span>Dom Casmurro</span>
+      <strong>Status:</strong> <span>Aprovado</span>
+      <strong>Entrega:</strong> <span>15/04/2025</span>
+      <button class="cancelar-btn">Cancelar</button>
+    </div>
+    
+    <div class="book-card pendente">
+      <strong>Título:</strong> <span>O Pequeno Príncipe</span>
+      <strong>Status:</strong> <span>Pendente</span>
+      <strong>Entrega:</strong> <span>20/04/2025</span>
+      <button class="cancelar-btn">Cancelar</button>
+    </div>
+    
+    <div class="book-card recusado">
+      <strong>Título:</strong> <span>A Revolução dos Bichos</span>
+      <strong>Status:</strong> <span>Recusado</span>
+      <strong>Entrega:</strong> <span>-</span>
+      <button class="cancelar-btn">Cancelar</button>
+    </div>
+    
+  </main>
+  <script>
+    const botoesCancelar = document.querySelectorAll('.cancelar-btn');
+    botoesCancelar.forEach(botao => {
+      botao.addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja cancelar esta solicitação?')) {
+          alert('Solicitação cancelada.');
+          // Aqui você poderia remover o card ou fazer uma requisição real
+        }
+      });
+    });
+  </script>
+  
+</body>
+</html>

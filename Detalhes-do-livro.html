@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes do Livro</title>
+  <link rel="stylesheet" href="css/detalhes.css" />
+</head>
+<body>
+
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+      <a href="index.html">Catálogo</a>
+      <a href="minhas.html">Minhas Solicitações</a>
+      <a href="doar.html">Doar livro</a>
+      <a href="usuario.html">Perfil</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Detalhes dos Livros</h1>
+  <div id="livros-container"></div>
+
+  <script>
+    // Simulação de dados de livros
+    const livros = [
+      {
+        titulo: "O Grande Gatsby",
+        autor: "F. Scott Fitzgerald",
+        descricao: "Um retrato da era do jazz e da vida da alta sociedade americana nos anos 1920.",
+        categoria: "Ficção",
+        classificacao: "16+",
+        status: "Disponível",
+        doador: {
+          nome: "João da Silva",
+          email: "joao.silva@email.com"
+        }
+      },
+      {
+        titulo: "1984",
+        autor: "George Orwell",
+        descricao: "Uma distopia sobre um regime totalitário que controla tudo.",
+        categoria: "Ficção Científica",
+        classificacao: "14+",
+        status: "Disponível",
+        doador: {
+          nome: "Maria Oliveira",
+          email: "maria.oliveira@email.com"
+        }
+      }
+      // Adicione mais livros conforme necessário
+    ];
+
+    const usuarioLogado = false; // Mude para true para simular um usuário logado
+
+    // Função para renderizar os livros na página
+    function renderizarLivros() {
+      const livrosContainer = document.getElementById('livros-container');
+      livrosContainer.innerHTML = '';
+
+      livros.forEach(livro => {
+        const livroDiv = document.createElement('div');
+        livroDiv.classList.add('livro');
+        livroDiv.innerHTML = `
+          <h2>Título: ${livro.titulo}</h2>
+          <p><strong>Autor:</strong> ${livro.autor}</p>
+          <p><strong>Descrição:</strong> ${livro.descricao}</p>
+          <p><strong>Categoria:</strong> ${livro.categoria}</p>
+          <p><strong>Classificação de Faixa Etária:</strong> ${livro.classificacao}</p>
+          <p><strong>Status:</strong> ${livro.status}</p>
+          <div class="doador-info">
+            <h3>Informações do Doador</h3>
+            <p><strong>Nome:</strong> ${livro.doador.nome}</p>
+            <p><strong>E-mail:</strong> ${livro.doador.email}</p>
+          </div>
+          <div id="acao-solicitar">
+            <button class="solicitar-livro">Solicitar Livro</button>
+            <button class="botao-login">Ir para Login</button>
+          </div>
+        `;
+        livrosContainer.appendChild(livroDiv);
+
+        // Adiciona evento para o botão de solicitar livro
+        livroDiv.querySelector('.solicitar-livro').addEventListener('click', function() {
+          if (!usuarioLogado) {
+            window.location.href = 'login.html';
+          } else {
+            alert('Solicitação do livro "${livro.titulo}" realizada com sucesso!');
+          }
+        });
+
+        // Adiciona evento para o botão de ir para login
+        livroDiv.querySelector('.botao-login').addEventListener('click', function() {
+          window.location.href = 'login.html';
+        });
+      });
+    }
+
+    // Renderiza os livros na página ao carregar
+    renderizarLivros();
+  </script>
+</body>
+</html>
