@@ -92,7 +92,7 @@
     async function carregarLivros() {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/api/books/catalog"
+          "http://127.0.0.1:8000/api/catalog/"
         );
         const livros = await response.json();
         const livrosContainer = document.getElementById("livros-container");
