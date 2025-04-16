@@ -28,7 +28,8 @@
         <input type="text" name="nome" placeholder="Nome completo" required />
         <input type="email" name="email" placeholder="E-mail" required />
         <input type="password" name="senha" placeholder="Senha" required />
-        <input type="text" name="endereço" placeholder="Endereço" required />
+        <input type="date" name="data_nascimento" placeholder="Data de Nascimento" required />
+        <input type="text" name="endereco" placeholder="Endereço" required />
         <input type="text" name="numero" placeholder="Número" required />
         <input type="text" name="cidade" placeholder="Cidade" required />
         <input type="text" name="cep" placeholder="CEP" required />
@@ -36,7 +37,78 @@
       </form>
     </div>
   </main>
+  <script>
+    const formLogin = document.getElementById('form-login');
+    const formCadastro = document.getElementById('form-cadastro');
 
+    // LOGIN
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = formLogin.email.value;
+      const password = formLogin.senha.value;
+
+      try {
+        const resposta = await fetch('http://127.0.0.1:8000/api/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!resposta.ok) throw new Error('Erro no login');
+
+        const dados = await resposta.json();
+        localStorage.setItem('accessToken', dados.access);
+        alert('Login realizado com sucesso!');
+        window.location.href = 'catalogo.html';
+      } catch (err) {
+        alert('Erro ao fazer login. Verifique seus dados.');
+        console.error(err);
+      }
+    });
+
+    // CADASTRO
+    formCadastro.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const dados = {
+        name: formCadastro.nome.value,
+        email: formCadastro.email.value,
+        password: formCadastro.senha.value,
+        birth_date: formCadastro.data_nascimento.value,
+        street: formCadastro.endereco.value,
+        number: formCadastro.numero.value,
+        city: formCadastro.cidade.value,
+        zip: formCadastro.cep.value,
+      };
+
+      try {
+        const resposta = await fetch('http://127.0.0.1:8000/api/users/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados),
+        });
+
+        if (!resposta.ok) {
+          const erro = await resposta.json();
+          let mensagens = [];
+
+          for (const campo in erro) {
+            mensagens.push(`${campo}: ${erro[campo].join(', ')}`);
+          }
+
+          throw new Error(mensagens.join('\n'));
+        }
+
+        const resultado = await resposta.json();
+        window.location.href = 'catalogo.html';
+        formCadastro.reset();
+      } catch (err) {
+        alert(err.message);
+        console.error(err);
+      }
+    });
+  </script>
 </body>
 
 </html>
