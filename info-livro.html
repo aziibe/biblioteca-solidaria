@@ -73,15 +73,39 @@
 
         livrosContainer.appendChild(livroDiv);
 
-        livroDiv.querySelector('.solicitar-livro').addEventListener('click', function () {
-          if (!usuarioLogado) {
+        livroDiv.querySelector('.solicitar-livro').addEventListener('click', async function () {
+          const token = localStorage.getItem('accessToken');
+
+          if (!token) {
             window.location.href = 'login.html';
-          } else {
-            alert('Solicitação do livro "${livro.title}" realizada com sucesso!');
+            return;
+          }
+
+          try {
+            const resposta = await fetch('http://127.0.0.1:8000/api/book_requests/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ book_id: idLivro })
+            });
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+              const mensagem = dados.detail || dados[0] || 'Erro ao solicitar o livro';
+              throw new Error(mensagem);
+            }
+
+            alert(`Solicitação do livro "${livro.title}" enviada com sucesso!`);
+          } catch (erro) {
+            alert(`Erro ao solicitar o livro: ${erro.message}`);
+            console.error(erro);
           }
         });
-      };
 
+      }
       buscarLivro();
     </script>
 </body>
