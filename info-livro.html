@@ -13,10 +13,12 @@
   <header>
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
-      <a href="catalogo.html">Catálogo</a>
-      <a href="solicitacoes.html">Minhas Solicitações</a>
-      <a href="gerenciar-livro.html">Doar livro</a>
-      <a href="painel-usuario.html">Perfil</a>
+      <a href="login.html" id="btn-login">Login</a>
+      <a href="catalogo.html" id="btn-catalogo" style="display: none;">Catalago</a>
+      <a href="gerenciar-livro.html" id="btn-meus-livros" style="display: none;">Meus Livros</a>
+      <a href="solicitacoes.html" id="btn-solicitacoes" style="display: none;">Minhas Solicitações</a>
+      <a href="perfil.html" id="btn-perfil" style="display: none;">Perfil</a>
+      <a id="btn-sair" style="display: none;">Sair</a>
     </nav>
   </header>
 
@@ -25,8 +27,40 @@
     <div id="livros-container"></div>
 
     <script>
+      const accessToken = localStorage.getItem("accessToken");
+      const btnLogin = document.getElementById("btn-login");
+      const btnSolicitacoes = document.getElementById("btn-solicitacoes");
+      const btnDoarLivro = document.getElementById("btn-meus-livros");
+      const btnPerfil = document.getElementById("btn-perfil");
+      const btnSair = document.getElementById("btn-sair");
+      const btnCatalogo = document.getElementById("btn-catalogo");
+
+      if (accessToken) {
+        // Usuário está logado
+        btnLogin.style.display = "none";
+        btnSolicitacoes.style.display = "inline";
+        btnDoarLivro.style.display = "inline";
+        btnPerfil.style.display = "inline";
+        btnSair.style.display = "inline";
+        btnCatalogo.style.display = "inline";
+      } else {
+        // Usuário não está logado
+        btnLogin.style.display = "inline";
+        btnSolicitacoes.style.display = "none";
+        btnDoarLivro.style.display = "none";
+        btnPerfil.style.display = "none";
+        btnSair.style.display = "none";
+        btnCatalogo.style.display = "none";
+      }
+
+      if (btnSair) {
+        btnSair.addEventListener("click", () => {
+          localStorage.removeItem("accessToken");
+          window.location.href = "login.html";
+        });
+      }
+
       const livrosContainer = document.getElementById('livros-container');
-      const usuarioLogado = false;
       const params = new URLSearchParams(window.location.search);
       const idLivro = params.get('id');
 

@@ -14,8 +14,10 @@
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
       <a href="catalogo.html">Catálogo</a>
+      <a href="meus-livros.html">Meus Livros</a>
       <a href="solicitacoes.html">Minhas Solicitações</a>
-      <a href="gerenciar-livro.html">Doar Livro</a>
+      <a href="perfil.html">Perfil</a>
+      <a id="btn-sair">Sair</a>
     </nav>
   </header>
 
@@ -123,6 +125,12 @@
         console.error(error);
         alert('Erro ao salvar as alterações.');
       }
+    });
+
+    const btnSair = document.getElementById('btn-sair');
+    btnSair.addEventListener('click', () => {
+      localStorage.removeItem('accessToken');
+      window.location.href = 'login.html';
     });
 
     window.onload = carregarDadosUsuario;
