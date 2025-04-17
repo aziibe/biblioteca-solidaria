@@ -17,7 +17,7 @@
       <a href="meus-livros.html" id="btn-meus-livros" style="display: none;">Meus Livros</a>
       <a href="solicitacoes.html" id="btn-solicitacoes" style="display: none;">Minhas Solicitações</a>
       <a href="perfil.html" id="btn-perfil" style="display: none;">Perfil</a>
-      <button id="btn-sair" style="display: none;">Sair</button>
+      <a id="btn-sair" style="display: none;">Sair</a>
     </nav>
   </header>
 
@@ -47,6 +47,12 @@
     </div>
 
     <div id="livros-container">
+      <!-- Botão fixo para adicionar um novo livro -->
+      <div class="book-card add-book-card" onclick="window.location.href='adicionar-livro.html'">
+        <div class="add-book-info">
+          <button class="add-book-button">+</button>
+        </div>
+      </div>
       <!-- Os livros do usuário serão inseridos aqui dinamicamente -->
     </div>
   </main>
@@ -76,7 +82,7 @@
     function filtrarLivros() {
       const genero = generoSelect.value;
       const etaria = etariaSelect.value;
-      const livros = document.querySelectorAll(".book-card");
+      const livros = document.querySelectorAll(".book-card:not(.add-book-card)");
 
       livros.forEach((livro) => {
         const generoLivro = livro.dataset.genero || "";
@@ -109,8 +115,6 @@
         const livrosContainer = document.getElementById("livros-container");
 
         if (livrosContainer) {
-          livrosContainer.innerHTML = "";
-
           livros.forEach((livro) => {
             const livroCard = document.createElement("div");
             livroCard.classList.add("book-card");
