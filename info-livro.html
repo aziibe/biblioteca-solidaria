@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detalhes do Livro</title>
   <link rel="stylesheet" href="css/detalhes.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </head>
 
 <body>
@@ -14,8 +15,8 @@
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
       <a href="login.html" id="btn-login">Login</a>
-      <a href="catalogo.html" id="btn-catalogo" style="display: none;">Catalago</a>
-      <a href="gerenciar-livro.html" id="btn-meus-livros" style="display: none;">Meus Livros</a>
+      <a href="catalogo.html" id="btn-catalogo" style="display: none;">Catálogo</a>
+      <a href="meus-livros.html" id="btn-meus-livros" style="display: none;">Meus Livros</a>
       <a href="solicitacoes.html" id="btn-solicitacoes" style="display: none;">Minhas Solicitações</a>
       <a href="perfil.html" id="btn-perfil" style="display: none;">Perfil</a>
       <a id="btn-sair" style="display: none;">Sair</a>
@@ -23,11 +24,15 @@
   </header>
 
   <main>
-    <h1>Detalhes dos Livros</h1>
+    <h1>Detalhes do Livro</h1>
     <div id="livros-container"></div>
 
     <script>
+      // Verificar se o usuário está logado
       const accessToken = localStorage.getItem("accessToken");
+      const decodedToken = accessToken ? jwt_decode(accessToken) : null;
+      const userId = decodedToken ? decodedToken.user_id : null;
+
       const btnLogin = document.getElementById("btn-login");
       const btnSolicitacoes = document.getElementById("btn-solicitacoes");
       const btnDoarLivro = document.getElementById("btn-meus-livros");
@@ -53,21 +58,29 @@
         btnCatalogo.style.display = "none";
       }
 
-      if (btnSair) {
-        btnSair.addEventListener("click", () => {
-          localStorage.removeItem("accessToken");
-          window.location.href = "login.html";
-        });
-      }
+      // Lógica para o botão "Sair"
+      btnSair.addEventListener("click", () => {
+        localStorage.removeItem("accessToken");
+        window.location.href = "login.html";
+      });
 
-      const livrosContainer = document.getElementById('livros-container');
+      const livrosContainer = document.getElementById("livros-container");
       const params = new URLSearchParams(window.location.search);
-      const idLivro = params.get('id');
+      const idLivro = params.get("id");
 
       // Busca o livro da API
       async function buscarLivro() {
         try {
-          const resposta = await fetch(`http://127.0.0.1:8000/api/catalog/${idLivro}/`);
+          const resposta = await fetch(`http://127.0.0.1:8000/api/catalog/${idLivro}/`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
+          if (!resposta.ok) {
+            throw new Error("Erro ao carregar detalhes do livro.");
+          }
+
           const livro = await resposta.json();
           renderizarLivro(livro);
         } catch (erro) {
@@ -77,71 +90,72 @@
       }
 
       function renderizarLivro(livro) {
-        const livroDiv = document.createElement('div');
-        livroDiv.classList.add('livro');
+        const livroDiv = document.createElement("div");
+        livroDiv.classList.add("livro");
         livroDiv.innerHTML = `
-        <h2>Título: ${livro.title}</h2>
-        <p><strong>Autor:</strong> ${livro.author}</p>
-        <p><strong>Descrição:</strong> ${livro.description}</p>
-        <p><strong>Categoria:</strong> ${livro.category}</p>
-        <p><strong>Classificação de Faixa Etária:</strong> ${livro.classification}</p>
-        <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"}</p>
+          <h2>Título: ${livro.title}</h2>
+          <p><strong>Autor:</strong> ${livro.author}</p>
+          <p><strong>Descrição:</strong> ${livro.description}</p>
+          <p><strong>Categoria:</strong> ${livro.category}</p>
+          <p><strong>Classificação de Faixa Etária:</strong> ${livro.classification}</p>
+          <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"}</p>
 
-        <div class="doador-info">
-          <h3>Doador</h3>
-          <p><strong>Usuário:</strong> ${livro.user}</p>
-        </div>
+          <div class="doador-info">
+            <h3>Doador</h3>
+            <p><strong>Usuário:</strong> ${livro.user}</p>
+            <p><strong>Email:</strong> ${livro.user_email}</p>
+          </div>
 
-        <div class="ponto-coleta">
-          <h3>Ponto de Coleta</h3>
-          <p><strong>Nome:</strong> ${livro.pickup_point.name}</p>
-          <p><strong>Endereço:</strong> ${livro.pickup_point.street}, ${livro.pickup_point.number}</p>
-          <p><strong>Cidade/Estado:</strong> ${livro.pickup_point.city} - ${livro.pickup_point.state}</p>
-          <p><strong>CEP:</strong> ${livro.pickup_point.zip}</p>
-        </div>
+          <div class="ponto-coleta">
+            <h3>Ponto de Coleta</h3>
+            <p><strong>Nome:</strong> ${livro.pickup_point.name}</p>
+            <p><strong>Endereço:</strong> ${livro.pickup_point.street}, ${livro.pickup_point.number}</p>
+            <p><strong>Cidade/Estado:</strong> ${livro.pickup_point.city} - ${livro.pickup_point.state}</p>
+            <p><strong>CEP:</strong> ${livro.pickup_point.zip}</p>
+          </div>
 
-        <div id="acao-solicitar">
-          <button class="solicitar-livro">Solicitar Livro</button>
-        </div>
-      `;
+          <div id="acao-livro">
+            ${livro.user_id === userId
+            ? `<button><a href="editar-livro.html?id=${livro.id}" class="edit-button">Editar</a></button>`
+            : `<button class="solicitar-livro">Solicitar Livro</button>`
+          }
+          </div>
+        `;
 
         livrosContainer.appendChild(livroDiv);
 
-        livroDiv.querySelector('.solicitar-livro').addEventListener('click', async function () {
-          const token = localStorage.getItem('accessToken');
+        // Adicionar evento ao botão "Solicitar Livro" (se não for do usuário)
+        if (livro.user_id !== userId) {
+          livroDiv.querySelector(".solicitar-livro").addEventListener("click", async function () {
+            try {
+              const resposta = await fetch("http://127.0.0.1:8000/api/book_requests/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ book_id: idLivro }),
+              });
 
-          if (!token) {
-            window.location.href = 'login.html';
-            return;
-          }
+              const dados = await resposta.json();
 
-          try {
-            const resposta = await fetch('http://127.0.0.1:8000/api/book_requests/', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ book_id: idLivro })
-            });
+              if (!resposta.ok) {
+                const mensagem = dados.detail || dados[0] || "Erro ao solicitar o livro";
+                throw new Error(mensagem);
+              }
 
-            const dados = await resposta.json();
-
-            if (!resposta.ok) {
-              const mensagem = dados.detail || dados[0] || 'Erro ao solicitar o livro';
-              throw new Error(mensagem);
+              alert(`Solicitação do livro "${livro.title}" enviada com sucesso!`);
+            } catch (erro) {
+              alert(`Erro ao solicitar o livro: ${erro.message}`);
+              console.error(erro);
             }
-
-            alert(`Solicitação do livro "${livro.title}" enviada com sucesso!`);
-          } catch (erro) {
-            alert(`Erro ao solicitar o livro: ${erro.message}`);
-            console.error(erro);
-          }
-        });
-
+          });
+        }
       }
+
       buscarLivro();
     </script>
+  </main>
 </body>
 
 </html>
