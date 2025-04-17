@@ -13,8 +13,10 @@
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
       <a href="catalogo.html">Catálogo</a>
+      <a href="meus-livros.html">Meus Livros</a>
       <a href="solicitacoes.html">Minhas Solicitações</a>
-      <a href="gerenciar-livro.html">Doar Livro</a>
+      <a href="perfil.html">Perfil</a>
+      <a id="btn-sair">Sair</a>
     </nav>
   </header>
 
@@ -61,7 +63,9 @@
 
     async function carregarUsuario() {
       try {
-        const userId = 33;
+        const decodedToken = jwt_decode(accessToken);
+        const userId = decodedToken.user_id;
+
         const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -89,8 +93,16 @@
       }
     }
 
+    const btnSair = document.getElementById('btn-sair');
+    btnSair.addEventListener('click', () => {
+      localStorage.removeItem('accessToken');
+      window.location.href = 'login.html';
+    });
+
+
     window.onload = carregarUsuario;
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </body>
 
 </html>
