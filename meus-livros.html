@@ -2,73 +2,183 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doar Livro - Biblioteca Solidária</title>
-  <link rel="stylesheet" href="css/doar.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meus Livros - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/catalogo.css" />
 </head>
 
 <body>
   <header>
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
-      <a href="catalogo.html">Catálogo</a>
-      <a href="meus-livros.html">Meus Livros</a>
-      <a href="solicitacoes.html">Minhas Solicitações</a>
-      <a href="perfil.html">Perfil</a>
-      <a id="btn-sair">Sair</a>
+      <a href="login.html" id="btn-login">Login</a>
+      <a href="catalogo.html" id="btn-catalogo" style="display: none;">Catálogo</a>
+      <a href="meus-livros.html" id="btn-meus-livros" style="display: none;">Meus Livros</a>
+      <a href="solicitacoes.html" id="btn-solicitacoes" style="display: none;">Minhas Solicitações</a>
+      <a href="perfil.html" id="btn-perfil" style="display: none;">Perfil</a>
+      <button id="btn-sair" style="display: none;">Sair</button>
     </nav>
   </header>
 
   <main>
-    <h1>Adicionar/Editar Livro</h1>
-    <form id="livro-form">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" required />
-
-      <label for="autor">Autor:</label>
-      <input type="text" id="autor" required />
-
-      <label for="descricao">Descrição:</label>
-      <textarea id="descricao" rows="4" required></textarea>
-
-      <label for="categoria">Categoria:</label>
-      <select id="categoria" required>
-        <option value="">Selecione uma categoria</option>
-        <option value="ficcao">Ficção</option>
-        <option value="nao-ficcao">Não Ficção</option>
-        <option value="aventura">Aventura</option>
+    <h2>📘 Meus Livros</h2>
+    <div class="filtros">
+      <label for="filtro-genero">Filtrar por Gênero:</label>
+      <select id="filtro-genero">
+        <option value="">Todos</option>
+        <option value="science_fiction">Ficção-Científica</option>
+        <option value="non_fiction">Não-Ficção</option>
+        <option value="adventure">Aventura</option>
         <option value="romance">Romance</option>
-        <option value="mistérios">Mistérios</option>
-        <option value="ficcao-cientifica">Ficção Científica</option>
+        <option value="horror">Horror</option>
+        <option value="fantasy">Fantasia</option>
       </select>
 
-      <label for="classificacao">Classificação de Faixa Etária:</label>
-      <select id="classificacao" required>
-        <option value="">Selecione uma classificação</option>
-        <option value="10+">10+</option>
-        <option value="13+">13+</option>
-        <option value="16+">16+</option>
-        <option value="18+">18+</option>
+      <label for="filtro-etaria">Filtrar por Faixa Etária:</label>
+      <select id="filtro-etaria">
+        <option value="">Todas</option>
+        <option value="all_ages">Livre</option>
+        <option value="10_and_up">10+</option>
+        <option value="13_and_up">13+</option>
+        <option value="16_and_up">16+</option>
+        <option value="18_and_up">18+</option>
       </select>
+    </div>
 
-      <button type="submit">Salvar</button>
-    </form>
+    <div id="livros-container">
+      <!-- Os livros do usuário serão inseridos aqui dinamicamente -->
+    </div>
+  </main>
 
-    <script>
-      document.getElementById('livro-form').addEventListener('submit', function (event) {
-        event.preventDefault();
-        alert('Livro salvo com sucesso!');
-        this.reset();
+  <script>
+    const generoSelect = document.getElementById("filtro-genero");
+    const etariaSelect = document.getElementById("filtro-etaria");
+
+    const categoriasTraduzidas = {
+      fantasy: "Fantasia",
+      non_fiction: "Não-ficção",
+      adventure: "Aventura",
+      romance: "Romance",
+      horror: "Horror",
+      science_fiction: "Ficção científica",
+    };
+
+    const classificacoesTraduzidas = {
+      "18_and_up": "18+",
+      "16_and_up": "16+",
+      "13_and_up": "13+",
+      "10_and_up": "10+",
+      all_ages: "Livre",
+    };
+
+    // Função para filtrar os livros
+    function filtrarLivros() {
+      const genero = generoSelect.value;
+      const etaria = etariaSelect.value;
+      const livros = document.querySelectorAll(".book-card");
+
+      livros.forEach((livro) => {
+        const generoLivro = livro.dataset.genero || "";
+        const faixaEtariaLivro = livro.dataset.etaria || "";
+
+        const generoCond = genero === "" || genero === generoLivro;
+        const etariaCond = etaria === "" || etaria === faixaEtariaLivro;
+
+        livro.style.display = generoCond && etariaCond ? "flex" : "none";
       });
+    }
 
-      const btnSair = document.getElementById('btn-sair');
-      btnSair.addEventListener('click', () => {
-        localStorage.removeItem('accessToken');
-        window.location.href = 'login.html';
-      });
-    </script>
+    generoSelect.addEventListener("change", filtrarLivros);
+    etariaSelect.addEventListener("change", filtrarLivros);
 
+    // Função para carregar os livros do usuário logado
+    async function carregarLivros() {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/my-books/", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao carregar os livros do usuário.");
+        }
+
+        const livros = await response.json();
+        const livrosContainer = document.getElementById("livros-container");
+
+        if (livrosContainer) {
+          livrosContainer.innerHTML = "";
+
+          livros.forEach((livro) => {
+            const livroCard = document.createElement("div");
+            livroCard.classList.add("book-card");
+            livroCard.dataset.genero = livro.category;
+            livroCard.dataset.etaria = livro.classification;
+
+            const categoriaTraduzida =
+              categoriasTraduzidas[livro.category] || livro.category;
+            const classificacaoTraduzida =
+              classificacoesTraduzidas[livro.classification] ||
+              livro.classification;
+
+            livroCard.innerHTML = `
+              <img src="img/livro.png" alt="Capa do livro" class="book-img">
+              <div class="book-info">
+                <p><strong>Título:</strong> ${livro.title}</p>
+                <p><strong>Autor:</strong> ${livro.author}</p>
+                <p><strong>Gênero:</strong> ${categoriaTraduzida}</p>
+                <p><strong>Classificação:</strong> ${classificacaoTraduzida}</p>
+                <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"
+              }</p>
+                <a href="info-livro.html?id=${livro.id}" class="edit-button">Ver Detalhes</a>
+              </div>`;
+            livrosContainer.appendChild(livroCard);
+          });
+
+          // Aplicar os filtros após carregar os livros
+          filtrarLivros();
+        }
+      } catch (error) {
+        console.error("Erro ao carregar livros:", error);
+        alert("Erro ao carregar os livros do usuário.");
+      }
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+    const btnLogin = document.getElementById("btn-login");
+    const btnSolicitacoes = document.getElementById("btn-solicitacoes");
+    const btnDoarLivro = document.getElementById("btn-meus-livros");
+    const btnPerfil = document.getElementById("btn-perfil");
+    const btnSair = document.getElementById("btn-sair");
+    const btnCatalogo = document.getElementById("btn-catalogo");
+
+    if (accessToken) {
+      // Usuário está logado
+      btnLogin.style.display = "none";
+      btnSolicitacoes.style.display = "inline";
+      btnDoarLivro.style.display = "inline";
+      btnPerfil.style.display = "inline";
+      btnSair.style.display = "inline";
+      btnCatalogo.style.display = "inline";
+    } else {
+      // Usuário não está logado
+      btnLogin.style.display = "inline";
+      btnSolicitacoes.style.display = "none";
+      btnDoarLivro.style.display = "none";
+      btnPerfil.style.display = "none";
+      btnSair.style.display = "none";
+      btnCatalogo.style.display = "none";
+    }
+
+    btnSair.addEventListener("click", () => {
+      localStorage.removeItem("accessToken");
+      window.location.href = "login.html";
+    });
+
+    window.onload = carregarLivros;
+  </script>
 </body>
 
 </html>

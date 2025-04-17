@@ -1,77 +1,85 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
-  }
-  
-  header {
-    background-color: #ffffff;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    color: rgb(0, 0, 0);
-  }
-  
-  header h1 {
-    margin: 0;
-  }
-  
-  nav a {
-    margin-left: 1rem;
-    text-decoration: none;
-    color: white;
-    border: 1px solid #fff;
-    border-radius: 50px;
-    transition: transform 0.2s;
-    background-color: #292929;
-    padding: 5px 15px;
-    font: italic small-caps bold 15px/15px Arial, Helvetica, sans-serif;
-  }
-  
-  nav a:hover {
-    background-color: #005fa3;
-  }
-  h1 {
-    color: #333;
-  }
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 20px;
+}
 
-  .livro {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
+header {
+	background-color: #ffffff;
+	padding: 1rem 2rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	color: rgb(0, 0, 0);
+}
 
-  .doador-info {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 5px;
-    margin-top: 20px;
-  }
+header h1 {
+	margin: 0;
+}
 
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
-  }
+nav a {
+	margin-left: 1rem;
+	text-decoration: none;
+	color: white;
+	border: 1px solid #fff;
+	border-radius: 50px;
+	transition: transform 0.2s;
+	background-color: #292929;
+	padding: 5px 15px;
+	font: italic small-caps bold 15px/15px Arial, Helvetica, sans-serif;
+}
 
-  button:hover {
-    background-color: #45a049;
-  }
+nav a:hover {
+	background-color: #005fa3;
+}
+h1 {
+	color: #333;
+}
 
-  .botao-login {
-    background-color: #007BFF;
-    margin-top: 10px;
-  }
+.livro {
+	background: white;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+}
 
-  .botao-login:hover {
-    background-color: #0056b3;
-  }
+.doador-info {
+	background: #f9f9f9;
+	padding: 15px;
+	border-radius: 5px;
+	margin-top: 20px;
+}
+
+button {
+	background-color: #4caf50;
+	color: white;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	margin-top: 15px;
+}
+
+button:hover {
+	background-color: #45a049;
+}
+
+.botao-login {
+	background-color: #007bff;
+	margin-top: 10px;
+}
+
+.botao-login:hover {
+	background-color: #0056b3;
+}
+
+a {
+	text-decoration: none;
+	color: white;
+	transition: transform 0.2s;
+	padding: 5px 15px;
+	font: italic small-caps bold 15px/15px Arial, Helvetica, sans-serif;
+}

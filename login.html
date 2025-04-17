@@ -59,7 +59,6 @@
 
         const dados = await resposta.json();
         localStorage.setItem('accessToken', dados.access);
-        alert('Login realizado com sucesso!');
         window.location.href = 'catalogo.html';
       } catch (err) {
         alert('Erro ao fazer login. Verifique seus dados.');

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Livro - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/editarperfil.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="meus-livros.html">Meus Livros</a>
+      <a href="solicitacoes.html">Minhas Solicitações</a>
+      <a href="perfil.html">Perfil</a>
+      <button id="btn-sair">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>✍️ Editar Livro</h2>
+
+    <section class="form-container">
+      <form action="#" method="POST" id="editar-livro-form">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required />
+
+        <label for="autor">Autor:</label>
+        <input type="text" id="autor" name="autor" required />
+
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao" required></textarea>
+
+        <label for="categoria">Categoria:</label>
+        <select id="categoria" name="categoria" required>
+          <option value="science_fiction">Ficção Científica</option>
+          <option value="non_fiction">Não Ficção</option>
+          <option value="adventure">Aventura</option>
+          <option value="romance">Romance</option>
+          <option value="horror">Horror</option>
+          <option value="fantasy">Fantasia</option>
+        </select>
+
+        <label for="classificacao">Classificação Etária:</label>
+        <select id="classificacao" name="classificacao" required>
+          <option value="all_ages">Livre</option>
+          <option value="10_and_up">10+</option>
+          <option value="13_and_up">13+</option>
+          <option value="16_and_up">16+</option>
+          <option value="18_and_up">18+</option>
+        </select>
+
+        <button type="submit">Salvar Alterações</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('Você precisa estar logado para acessar esta página.');
+      window.location.href = 'login.html';
+    }
+
+    const decodedToken = jwt_decode(accessToken);
+    const userId = decodedToken.user_id;
+
+    const params = new URLSearchParams(window.location.search);
+    const livroId = params.get('id');
+
+    async function carregarDadosLivro() {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/my-books/${livroId}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao carregar os dados do livro.');
+        }
+
+        const livro = await response.json();
+
+        document.getElementById('titulo').value = livro.title;
+        document.getElementById('autor').value = livro.author;
+        document.getElementById('descricao').value = livro.description;
+        document.getElementById('categoria').value = livro.category;
+        document.getElementById('classificacao').value = livro.classification;
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar os dados do livro.');
+      }
+    }
+
+    document.getElementById('editar-livro-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const titulo = document.getElementById('titulo').value;
+        const autor = document.getElementById('autor').value;
+        const descricao = document.getElementById('descricao').value;
+        const categoria = document.getElementById('categoria').value;
+        const classificacao = document.getElementById('classificacao').value;
+
+        const response = await fetch(`http://127.0.0.1:8000/api/my-books/${livroId}/`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            title: titulo,
+            author: autor,
+            description: descricao,
+            category: categoria,
+            classification: classificacao,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao salvar as alterações.');
+        }
+
+        alert('Alterações salvas com sucesso!');
+        window.location.href = 'meus-livros.html';
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao salvar as alterações.');
+      }
+    });
+
+    const btnSair = document.getElementById('btn-sair');
+    btnSair.addEventListener('click', () => {
+      localStorage.removeItem('accessToken');
+      window.location.href = 'login.html';
+    });
+
+    window.onload = carregarDadosLivro;
+  </script>
+</body>
+
+</html>
