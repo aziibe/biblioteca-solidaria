@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adicionar Livro - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/editarperfil.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>📚 Biblioteca Solidária</h1>
+    <nav>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="meus-livros.html">Meus Livros</a>
+      <a href="solicitacoes.html">Minhas Solicitações</a>
+      <a href="perfil.html">Perfil</a>
+      <a id="btn-sair">Sair</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>📘 Adicionar Livro</h2>
+
+    <section class="form-container">
+      <form action="#" method="POST" id="adicionar-livro-form">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required />
+
+        <label for="autor">Autor:</label>
+        <input type="text" id="autor" name="autor" required />
+
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao" required></textarea>
+
+        <label for="categoria">Categoria:</label>
+        <select id="categoria" name="categoria" required>
+          <option value="science_fiction">Ficção Científica</option>
+          <option value="non_fiction">Não Ficção</option>
+          <option value="adventure">Aventura</option>
+          <option value="romance">Romance</option>
+          <option value="horror">Horror</option>
+          <option value="fantasy">Fantasia</option>
+        </select>
+
+        <label for="classificacao">Classificação Etária:</label>
+        <select id="classificacao" name="classificacao" required>
+          <option value="all_ages">Livre</option>
+          <option value="10_and_up">10+</option>
+          <option value="13_and_up">13+</option>
+          <option value="16_and_up">16+</option>
+          <option value="18_and_up">18+</option>
+        </select>
+
+        <label for="pickup_point">Ponto de Coleta:</label>
+        <select id="pickup_point" name="pickup_point" required>
+          <!-- Os pontos de coleta serão preenchidos dinamicamente -->
+        </select>
+
+        <div class="form-buttons">
+          <button type="submit">Adicionar Livro</button>
+          <button class="btn_cancelar" type="button" id="cancelar">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('Você precisa estar logado para acessar esta página.');
+      window.location.href = 'login.html';
+    }
+
+    const btnSair = document.getElementById('btn-sair');
+    btnSair.addEventListener('click', () => {
+      localStorage.removeItem('accessToken');
+      window.location.href = 'login.html';
+    });
+
+    // Função para carregar os pontos de coleta
+    async function carregarPontosDeColeta() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/pickup-points/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao carregar os pontos de coleta.');
+        }
+
+        const pontos = await response.json();
+        const pickupPointSelect = document.getElementById('pickup_point');
+
+        pontos.forEach((ponto) => {
+          const option = document.createElement('option');
+          option.value = ponto.id;
+          option.textContent = `${ponto.name} - ${ponto.city}, ${ponto.state}`;
+          pickupPointSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar os pontos de coleta.');
+      }
+    }
+
+    // Função para adicionar um novo livro
+    document.getElementById('adicionar-livro-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const titulo = document.getElementById('titulo').value;
+        const autor = document.getElementById('autor').value;
+        const descricao = document.getElementById('descricao').value;
+        const categoria = document.getElementById('categoria').value;
+        const classificacao = document.getElementById('classificacao').value;
+        const pickupPointId = document.getElementById('pickup_point').value;
+
+        const response = await fetch('http://127.0.0.1:8000/api/my-books/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            title: titulo,
+            author: autor,
+            description: descricao,
+            category: categoria,
+            classification: classificacao,
+            pickup_point_id: pickupPointId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao adicionar o livro.');
+        }
+
+        const livro = await response.json(); // Obtemos o livro recém-criado
+        alert('Livro adicionado com sucesso!');
+        window.location.href = `info-livro.html?id=${livro.id}`; // Redireciona para a página de detalhes do livro
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao adicionar o livro.');
+      }
+    });
+
+    // Botão de cancelar
+    document.getElementById('cancelar').addEventListener('click', () => {
+      window.location.href = 'meus-livros.html';
+    });
+
+    // Carregar os pontos de coleta ao carregar a página
+    window.onload = carregarPontosDeColeta;
+  </script>
+</body>
+
+</html>
