@@ -53,18 +53,15 @@
   </main>
 
   <script>
-    // Verificar se o usuário está logado
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
       alert('Você precisa estar logado para acessar esta página.');
       window.location.href = 'login.html';
     }
 
-    // Função para carregar as informações do usuário
     async function carregarUsuario() {
       try {
-        // Substitua {id} pelo ID do usuário logado
-        const userId = 33; // Exemplo: ID fixo (ajuste para obter dinamicamente)
+        const userId = 33;
         const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -77,7 +74,6 @@
 
         const usuario = await response.json();
 
-        // Preencher a seção user-info dinamicamente
         const userInfoSection = document.getElementById('user-info');
         userInfoSection.innerHTML = `
           <p><strong>Nome:</strong> ${usuario.name}</p>
@@ -93,7 +89,6 @@
       }
     }
 
-    // Carregar as informações do usuário ao carregar a página
     window.onload = carregarUsuario;
   </script>
 </body>
