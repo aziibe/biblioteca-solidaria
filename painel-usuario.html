@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel do Usuário - Biblioteca Solidária</title>
   <link rel="stylesheet" href="css/usuario.css" />
 </head>
+
 <body>
   <header>
     <h1>📚 Biblioteca Solidária</h1>
     <nav>
-      <a href="index.html">Catálogo</a>
-      <a href="minhas.html">Minhas Solicitações</a>
-      <a href="doar.html">Doar Livro</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="solicitacoes.html">Minhas Solicitações</a>
+      <a href="gerenciar-livro.html">Doar Livro</a>
     </nav>
   </header>
 
   <main>
     <h2>👤 Painel do Usuário</h2>
 
-    <section class="user-info">
-      <p><strong>Nome:</strong> Fulano da Silva</p>
-      <p><strong>Email:</strong> fulano@email.com</p>
-      <p><strong>Endereço:</strong> Rua Exemplo, 123 - Cidade, CEP 12345-678</p>
-      <a href="editar-perfil.html" class="edit-button">Editar Perfil</a>
+    <section class="user-info" id="user-info">
+      <!-- Os dados do usuário serão carregados dinamicamente aqui -->
+    </section>
 
     <section class="doacoes">
       <h3>📘 Livros Doado por Mim</h3>
@@ -31,25 +31,71 @@
         <li><strong>Livro:</strong> Dom Casmurro – <em>Status: Disponível</em></li>
         <li><strong>Livro:</strong> Capitães da Areia – <em>Status: Doado</em></li>
       </ul>
-      
     </section>
+
     <section class="solicitacoes-recebidas">
-        <h3>📨 Solicitações Recebidas</h3>
-        <ul>
-          <li>
-            <p><strong>Solicitante:</strong> João Souza</p>
-            <p><strong>Livro:</strong> Dom Casmurro</p>
-            <p><strong>Data da Solicitação:</strong> 10/04/2025</p>
-            <button class="entrega-button">Confirmar Entrega</button>
-          </li>
-          <li>
-            <p><strong>Solicitante:</strong> Maria Oliveira</p>
-            <p><strong>Livro:</strong> Capitães da Areia</p>
-            <p><strong>Data da Solicitação:</strong> 08/04/2025</p>
-            <button class="entrega-button">Confirmar Entrega</button>
-          </li>
-        </ul>
-      </section>      
+      <h3>📨 Solicitações Recebidas</h3>
+      <ul>
+        <li>
+          <p><strong>Solicitante:</strong> João Souza</p>
+          <p><strong>Livro:</strong> Dom Casmurro</p>
+          <p><strong>Data da Solicitação:</strong> 10/04/2025</p>
+          <button class="entrega-button">Confirmar Entrega</button>
+        </li>
+        <li>
+          <p><strong>Solicitante:</strong> Maria Oliveira</p>
+          <p><strong>Livro:</strong> Capitães da Areia</p>
+          <p><strong>Data da Solicitação:</strong> 08/04/2025</p>
+          <button class="entrega-button">Confirmar Entrega</button>
+        </li>
+      </ul>
+    </section>
   </main>
+
+  <script>
+    // Verificar se o usuário está logado
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('Você precisa estar logado para acessar esta página.');
+      window.location.href = 'login.html';
+    }
+
+    // Função para carregar as informações do usuário
+    async function carregarUsuario() {
+      try {
+        // Substitua {id} pelo ID do usuário logado
+        const userId = 33; // Exemplo: ID fixo (ajuste para obter dinamicamente)
+        const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao carregar informações do usuário.');
+        }
+
+        const usuario = await response.json();
+
+        // Preencher a seção user-info dinamicamente
+        const userInfoSection = document.getElementById('user-info');
+        userInfoSection.innerHTML = `
+          <p><strong>Nome:</strong> ${usuario.name}</p>
+          <p><strong>Email:</strong> ${usuario.email}</p>
+          <p><strong>Data de Nascimento:</strong> ${usuario.birth_date}</p>
+          <p><strong>Telefone:</strong> ${usuario.phone}</p>
+          <p><strong>Endereço:</strong> ${usuario.address.street}, ${usuario.address.number} - ${usuario.address.city}, CEP ${usuario.address.zip}</p>
+          <a href="editar-perfil.html" class="edit-button">Editar Perfil</a>
+        `;
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar informações do usuário.');
+      }
+    }
+
+    // Carregar as informações do usuário ao carregar a página
+    window.onload = carregarUsuario;
+  </script>
 </body>
+
 </html>
