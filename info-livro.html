@@ -175,6 +175,7 @@
               }
 
               alert(`Solicitação do livro "${livro.title}" enviada com sucesso!`);
+              window.location.href = "solicitacoes.html";
             } catch (erro) {
               alert(`Erro ao solicitar o livro: ${erro.message}`);
               console.error(erro);
