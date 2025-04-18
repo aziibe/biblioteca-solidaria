@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Minhas Solicitações - Biblioteca Solidária</title>
-  <link rel="stylesheet" href="css/minhas.css" />
+  <title>Solicitações - Biblioteca Solidária</title>
+  <link rel="stylesheet" href="css/solicitacoes.css" />
 </head>
 
 <body>
@@ -13,7 +13,7 @@
     <nav>
       <a href="catalogo.html">Catálogo</a>
       <a href="meus-livros.html">Meus Livros</a>
-      <a href="solicitacoes.html">Minhas Solicitações</a>
+      <a href="solicitacoes.html">Solicitações</a>
       <a href="perfil.html">Perfil</a>
       <a id="btn-sair">Sair</a>
     </nav>
@@ -21,39 +21,113 @@
 
   <main>
     <h2>Minhas Solicitações</h2>
-
-    <div class="book-card aprovado">
-      <strong>Título:</strong> <span>Dom Casmurro</span>
-      <strong>Status:</strong> <span>Aprovado</span>
-      <strong>Entrega:</strong> <span>15/04/2025</span>
-      <button class="cancelar-btn">Cancelar</button>
-    </div>
-
-    <div class="book-card pendente">
-      <strong>Título:</strong> <span>O Pequeno Príncipe</span>
-      <strong>Status:</strong> <span>Pendente</span>
-      <strong>Entrega:</strong> <span>20/04/2025</span>
-      <button class="cancelar-btn">Cancelar</button>
-    </div>
-
-    <div class="book-card recusado">
-      <strong>Título:</strong> <span>A Revolução dos Bichos</span>
-      <strong>Status:</strong> <span>Recusado</span>
-      <strong>Entrega:</strong> <span>-</span>
-      <button class="cancelar-btn">Cancelar</button>
-    </div>
-
+    <!-- Contêiner vazio onde os cards serão adicionados dinamicamente -->
+    <div id="solicitacoes-container"></div>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
   <script>
-    const botoesCancelar = document.querySelectorAll('.cancelar-btn');
-    botoesCancelar.forEach(botao => {
-      botao.addEventListener('click', () => {
-        if (confirm('Tem certeza que deseja cancelar esta solicitação?')) {
-          alert('Solicitação cancelada.');
-          // Aqui você poderia remover o card ou fazer uma requisição real
+
+    const token = localStorage.getItem('accessToken');
+
+    async function carregarSolicitacoes() {
+      const response = await fetch('http://127.0.0.1:8000/api/book_requests/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
       });
-    });
+
+      const solicitacoes = await response.json();
+      const main = document.querySelector('main');
+      const solicitacoesFiltradas = solicitacoes.filter(solicitacao => solicitacao.status !== 'cancelled' && solicitacao.status !== 'delivered');
+
+      solicitacoesFiltradas.forEach(solicitacao => {
+        const card = document.createElement('div');
+        card.classList.add('book-card');
+
+        const status = solicitacao.status;
+
+        if (status === 'pending') card.classList.add('pendente');
+        else if (status === 'awaiting_pickup') card.classList.add('aguardando-retirada');
+        else if (status === 'cancelled') card.classList.add('cancelado');
+        else if (status === 'delivered') card.classList.add('entregue');
+
+        card.innerHTML = `
+        <strong>Título:</strong> <span>${solicitacao.book.title}</span>
+        <strong>Doador:</strong> <span>${solicitacao.book.donated_by.name}</span>
+        <strong>Contato:</strong> <span>${solicitacao.book.donated_by.email}</span>
+        <strong>Status:</strong> <span>${solicitacao.status}</span>
+      `;
+
+        if (status === 'pending' || status === 'awaiting_pickup') {
+          const btnCancelar = document.createElement('button');
+          btnCancelar.textContent = 'Cancelar';
+          btnCancelar.classList.add('cancelar-btn');
+          btnCancelar.addEventListener('click', async () => {
+            const confirmar = confirm('Tem certeza que deseja cancelar esta solicitação?');
+            if (confirmar) {
+              try {
+                const response = await fetch(`http://127.0.0.1:8000/api/book_requests/${solicitacao.id}/cancel/`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                if (response.ok) {
+                  alert('Solicitação cancelada.');
+                  card.remove();
+                } else {
+                  const errorData = await response.json();
+                  alert(`Erro ao cancelar a solicitação: ${errorData.detail || 'Erro desconhecido.'}`);
+                }
+              } catch (error) {
+                console.error('Erro ao cancelar a solicitação:', error);
+                alert('Erro ao cancelar a solicitação. Tente novamente mais tarde.');
+              }
+            }
+          });
+          card.appendChild(btnCancelar);
+        }
+
+        if (status === 'awaiting_pickup') {
+          const btnConfirmar = document.createElement('button');
+          btnConfirmar.textContent = 'Confirmar Retirada';
+          btnConfirmar.classList.add('confirmar-btn');
+          btnConfirmar.addEventListener('click', async () => {
+            const confirmar = confirm('Confirmar Retirada?');
+            if (confirmar) {
+              try {
+                const response = await fetch(`http://127.0.0.1:8000/api/book_requests/${solicitacao.id}/confirm-pickup/`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                if (response.ok) {
+                  alert('Retirada confirmada.');
+                  card.remove();
+                } else {
+                  const errorData = await response.json();
+                  alert(`Erro ao confirmar retirada: ${errorData.detail || 'Erro desconhecido.'}`);
+                }
+              } catch (error) {
+                console.error('Erro ao confirmar retirada:', error);
+                alert('Erro ao confirmar retirada. Tente novamente mais tarde.');
+              }
+            }
+          });
+          card.appendChild(btnConfirmar);
+        }
+
+        main.appendChild(card);
+      });
+    }
+
+    carregarSolicitacoes();
 
     const btnSair = document.getElementById('btn-sair');
     btnSair.addEventListener('click', () => {
@@ -61,7 +135,6 @@
       window.location.href = 'login.html';
     });
   </script>
-
 </body>
 
 </html>
