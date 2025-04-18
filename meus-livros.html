@@ -44,6 +44,13 @@
         <option value="16_and_up">16+</option>
         <option value="18_and_up">18+</option>
       </select>
+
+      <label for="filtro-status">Filtrar por Status:</label>
+      <select id="filtro-status">
+        <option value="todos">Todos</option>
+        <option value="disponiveis">Disponíveis</option>
+        <option value="indisponiveis">Indisponíveis</option>
+      </select>
     </div>
 
     <div id="livros-container">
@@ -98,6 +105,27 @@
     generoSelect.addEventListener("change", filtrarLivros);
     etariaSelect.addEventListener("change", filtrarLivros);
 
+    // Função para filtrar os livros por status
+    function filtrarPorStatus() {
+      const filtroStatus = document.getElementById("filtro-status").value;
+      const livros = document.querySelectorAll(".book-card");
+
+      livros.forEach((livro) => {
+        const isIndisponivel = livro.classList.contains("indisponivel");
+
+        if (filtroStatus === "todos") {
+          livro.style.display = "flex"; // Mostra todos os livros
+        } else if (filtroStatus === "disponiveis") {
+          livro.style.display = isIndisponivel ? "none" : "flex"; // Mostra apenas os disponíveis
+        } else if (filtroStatus === "indisponiveis") {
+          livro.style.display = isIndisponivel ? "flex" : "none"; // Mostra apenas os indisponíveis
+        }
+      });
+    }
+
+    // Adicionar evento ao filtro de status
+    document.getElementById("filtro-status").addEventListener("change", filtrarPorStatus);
+
     // Função para carregar os livros do usuário logado
     async function carregarLivros() {
       try {
@@ -115,17 +143,24 @@
         const livrosContainer = document.getElementById("livros-container");
 
         if (livrosContainer) {
-          livros.forEach((livro) => {
+          // Separar livros disponíveis e indisponíveis
+          const livrosDisponiveis = livros.filter((livro) => livro.status === "available");
+          const livrosIndisponiveis = livros.filter((livro) => livro.status !== "available");
+
+          // Função para criar o card do livro
+          const criarLivroCard = (livro, isIndisponivel) => {
             const livroCard = document.createElement("div");
             livroCard.classList.add("book-card");
+            if (isIndisponivel) {
+              livroCard.classList.add("indisponivel"); // Adiciona classe para estilizar o card cinza
+            }
             livroCard.dataset.genero = livro.category;
             livroCard.dataset.etaria = livro.classification;
 
             const categoriaTraduzida =
               categoriasTraduzidas[livro.category] || livro.category;
             const classificacaoTraduzida =
-              classificacoesTraduzidas[livro.classification] ||
-              livro.classification;
+              classificacoesTraduzidas[livro.classification] || livro.classification;
 
             livroCard.innerHTML = `
               <img src="img/livro.png" alt="Capa do livro" class="book-img">
@@ -134,15 +169,27 @@
                 <p><strong>Autor:</strong> ${livro.author}</p>
                 <p><strong>Gênero:</strong> ${categoriaTraduzida}</p>
                 <p><strong>Classificação:</strong> ${classificacaoTraduzida}</p>
-                <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"
-              }</p>
-                <a href="info-livro.html?id=${livro.id}" class="edit-button">Ver Detalhes</a>
+                <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"}</p>
+                <a href="info-livro.html?id=${livro.id}&source=my-books" class="edit-button">Ver Detalhes</a>
               </div>`;
+            return livroCard;
+          };
+
+          // Adicionar livros disponíveis primeiro
+          livrosDisponiveis.forEach((livro) => {
+            const livroCard = criarLivroCard(livro, false);
+            livrosContainer.appendChild(livroCard);
+          });
+
+          // Adicionar livros indisponíveis no final
+          livrosIndisponiveis.forEach((livro) => {
+            const livroCard = criarLivroCard(livro, true);
             livrosContainer.appendChild(livroCard);
           });
 
           // Aplicar os filtros após carregar os livros
           filtrarLivros();
+          filtrarPorStatus();
         }
       } catch (error) {
         console.error("Erro ao carregar livros:", error);

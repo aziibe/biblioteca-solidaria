@@ -67,16 +67,41 @@
       const livrosContainer = document.getElementById("livros-container");
       const params = new URLSearchParams(window.location.search);
       const idLivro = params.get("id");
+      const source = params.get("source");
+
+      // Define o endpoint com base na origem
+      const endpoint =
+        source === "my-books"
+          ? `http://127.0.0.1:8000/api/my-books/${idLivro}/`
+          : `http://127.0.0.1:8000/api/catalog/${idLivro}/`;
+
+      const headers = source === "my-books" && accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : {};
+
+      // Mapeamento para tradução de categorias
+      const categoriasTraduzidas = {
+        science_fiction: "Ficção Científica",
+        non_fiction: "Não Ficção",
+        adventure: "Aventura",
+        romance: "Romance",
+        horror: "Horror",
+        fantasy: "Fantasia",
+      };
+
+      // Mapeamento para tradução de classificações de faixa etária
+      const classificacoesTraduzidas = {
+        all_ages: "Livre",
+        "10_and_up": "10+",
+        "13_and_up": "13+",
+        "16_and_up": "16+",
+        "18_and_up": "18+",
+      };
 
       // Busca o livro da API
       async function buscarLivro() {
         try {
-          const resposta = await fetch(`http://127.0.0.1:8000/api/catalog/${idLivro}/`, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
+          const resposta = await fetch(endpoint, { headers });
           if (!resposta.ok) {
             throw new Error("Erro ao carregar detalhes do livro.");
           }
@@ -90,14 +115,17 @@
       }
 
       function renderizarLivro(livro) {
+        const categoriaTraduzida = categoriasTraduzidas[livro.category] || livro.category;
+        const classificacaoTraduzida = classificacoesTraduzidas[livro.classification] || livro.classification;
+
         const livroDiv = document.createElement("div");
         livroDiv.classList.add("livro");
         livroDiv.innerHTML = `
           <h2>Título: ${livro.title}</h2>
           <p><strong>Autor:</strong> ${livro.author}</p>
           <p><strong>Descrição:</strong> ${livro.description}</p>
-          <p><strong>Categoria:</strong> ${livro.category}</p>
-          <p><strong>Classificação de Faixa Etária:</strong> ${livro.classification}</p>
+          <p><strong>Categoria:</strong> ${categoriaTraduzida}</p>
+          <p><strong>Classificação de Faixa Etária:</strong> ${classificacaoTraduzida}</p>
           <p><strong>Status:</strong> ${livro.status === "available" ? "Disponível" : "Indisponível"}</p>
 
           <div class="doador-info">
@@ -115,17 +143,19 @@
           </div>
 
           <div id="acao-livro">
-            ${livro.user_id === userId
-            ? `<button><a href="editar-livro.html?id=${livro.id}" class="edit-button">Editar</a></button>`
-            : `<button class="solicitar-livro">Solicitar Livro</button>`
+            ${!accessToken
+            ? `<button class="solicitar-livro" onclick="window.location.href='login.html'">Solicitar Livro</button>`
+            : livro.user_id === userId
+              ? `<button><a href="editar-livro.html?id=${livro.id}" class="edit-button">Editar</a></button>`
+              : `<button class="solicitar-livro">Solicitar Livro</button>`
           }
           </div>
         `;
 
         livrosContainer.appendChild(livroDiv);
 
-        // Adicionar evento ao botão "Solicitar Livro" (se não for do usuário)
-        if (livro.user_id !== userId) {
+        // Adicionar evento ao botão "Solicitar Livro" (se o usuário estiver logado e não for o dono do livro)
+        if (accessToken && livro.user_id !== userId) {
           livroDiv.querySelector(".solicitar-livro").addEventListener("click", async function () {
             try {
               const resposta = await fetch("http://127.0.0.1:8000/api/book_requests/", {
