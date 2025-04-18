@@ -99,7 +99,18 @@
           throw new Error(mensagens.join('\n'));
         }
 
-        const resultado = await resposta.json();
+        const loginResposta = await fetch('http://127.0.0.1:8000/api/login/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: dados.email, password: dados.password }),
+        });
+
+        if (!loginResposta.ok) {
+          throw new Error('Cadastro realizado, mas houve um erro ao fazer login.');
+        }
+
+        const loginDados = await loginResposta.json();
+        localStorage.setItem('accessToken', loginDados.access);
         window.location.href = 'catalogo.html';
         formCadastro.reset();
       } catch (err) {
