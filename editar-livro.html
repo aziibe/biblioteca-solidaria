@@ -54,7 +54,10 @@
           <option value="18_and_up">18+</option>
         </select>
 
-        <button type="submit">Salvar Alterações</button>
+        <div class="form-buttons">
+          <button type="submit">Salvar Alterações</button>
+          <button class="btn_cancelar" type="button" id="btn-cancelar">Cancelar</button>
+        </div>
       </form>
     </section>
   </main>
@@ -138,6 +141,11 @@
     btnSair.addEventListener('click', () => {
       localStorage.removeItem('accessToken');
       window.location.href = 'login.html';
+    });
+
+    const btnCancelar = document.getElementById('btn-cancelar');
+    btnCancelar.addEventListener('click', () => {
+      window.location.href = 'meus-livros.html';
     });
 
     window.onload = carregarDadosLivro;

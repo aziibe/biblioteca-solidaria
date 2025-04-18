@@ -27,21 +27,36 @@
     <section class="form-container">
       <form action="#" method="POST" id="editar-form">
         <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" required />
+        <input type="text" id="nome" name="nome" />
 
         <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required />
+        <input type="email" id="email" name="email" />
 
         <label for="senha">Senha:</label>
         <input type="password" id="senha" name="senha" required />
 
+        <label for="data_nascimento">Data de Nascimento:</label>
+        <input type="date" id="data_nascimento" name="data_nascimento" />
+
         <label for="telefone">Telefone:</label>
-        <input type="number" id="telefone" name="telefone" required />
+        <input type="tel" id="telefone" name="telefone" />
 
         <label for="endereco">Endereço:</label>
-        <input type="text" id="endereco" name="endereco" required />
+        <input type="text" id="endereco" name="endereco" />
 
-        <button type="submit">Salvar Alterações</button>
+        <label for="numero">Número:</label>
+        <input type="text" id="numero" name="numero" />
+
+        <label for="cidade">Cidade:</label>
+        <input type="text" id="cidade" name="cidade" />
+
+        <label for="cep">CEP:</label>
+        <input type="text" id="cep" name="cep" />
+
+        <div class="form-buttons">
+          <button type="submit">Salvar Alterações</button>
+          <button class="btn_cancelar" type="button" id="btn-cancelar">Cancelar</button>
+        </div>
       </form>
     </section>
   </main>
@@ -74,7 +89,14 @@
         document.getElementById('nome').value = usuario.name;
         document.getElementById('email').value = usuario.email;
         document.getElementById('telefone').value = usuario.phone;
-        document.getElementById('endereco').value = `${usuario.address.street}, ${usuario.address.number} - ${usuario.address.city}, CEP ${usuario.address.zip}`;
+        document.getElementById('data_nascimento').value = usuario.birth_date;
+
+        if (usuario.address) {
+          document.getElementById('endereco').value = usuario.address.street || '';
+          document.getElementById('numero').value = usuario.address.number || '';
+          document.getElementById('cidade').value = usuario.address.city || '';
+          document.getElementById('cep').value = usuario.address.zip || '';
+        }
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar os dados do usuário.');
@@ -85,15 +107,36 @@
       e.preventDefault();
 
       try {
-        const nome = document.getElementById('nome').value;
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
-        const telefone = document.getElementById('telefone').value;
-        const endereco = document.getElementById('endereco').value;
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+        const dataNascimento = document.getElementById('data_nascimento').value.trim();
+        const endereco = document.getElementById('endereco').value.trim();
+        const numero = document.getElementById('numero').value.trim();
+        const cidade = document.getElementById('cidade').value.trim();
+        const cep = document.getElementById('cep').value.trim();
 
-        const [street, numberAndCity] = endereco.split(', ');
-        const [number, cityAndZip] = numberAndCity.split(' - ');
-        const [city, zip] = cityAndZip.replace('CEP ', '').split(', ');
+        const body = {};
+
+        if (nome) body.name = nome;
+        if (email) body.email = email;
+        if (senha) body.password = senha;
+        if (telefone) body.phone = telefone;
+        if (dataNascimento) body.birth_date = dataNascimento;
+
+        const address = {};
+        if (endereco) address.street = endereco;
+        if (numero) address.number = numero;
+        if (cidade) address.city = cidade;
+        if (cep) address.zip = cep;
+
+        if (Object.keys(address).length > 0) {
+          body.street = address.street;
+          body.number = address.number;
+          body.city = address.city;
+          body.zip = address.zip;
+        }
 
         const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
           method: 'PATCH',
@@ -101,29 +144,27 @@
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
           },
-          body: JSON.stringify({
-            name: nome,
-            email: email,
-            password: senha,
-            phone: telefone,
-            address: {
-              street: street,
-              number: number,
-              city: city,
-              zip: zip,
-            },
-          }),
+          body: JSON.stringify(body),
         });
 
         if (!response.ok) {
-          throw new Error('Erro ao salvar as alterações.');
+          const errorData = await response.json();
+          let errorMessage = 'Erro ao salvar as alterações.';
+          if (errorData.detail) {
+            errorMessage = errorData.detail;
+          } else if (typeof errorData === 'object') {
+            errorMessage = Object.entries(errorData)
+              .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
+              .join('\n');
+          }
+          throw new Error(errorMessage);
         }
 
         alert('Alterações salvas com sucesso!');
-        window.location.href = 'painel-usuario.html';
+        window.location.href = 'perfil.html';
       } catch (error) {
         console.error(error);
-        alert('Erro ao salvar as alterações.');
+        alert(error.message || 'Erro ao salvar as alterações.');
       }
     });
 
@@ -131,6 +172,11 @@
     btnSair.addEventListener('click', () => {
       localStorage.removeItem('accessToken');
       window.location.href = 'login.html';
+    });
+
+    const btnCancelar = document.getElementById('btn-cancelar');
+    btnCancelar.addEventListener('click', () => {
+      window.location.href = 'perfil.html';
     });
 
     window.onload = carregarDadosUsuario;
