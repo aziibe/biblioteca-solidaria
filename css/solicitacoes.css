@@ -121,6 +121,7 @@ main h2 {
 /* Botão de cancelar */
 .cancelar-btn {
 	margin-top: 15px;
+	margin-right: 15px;
 	padding: 10px 20px;
 	background-color: #f44336;
 	color: white;
@@ -135,9 +136,9 @@ main h2 {
 	background-color: #d32f2f;
 }
 
-.confirmar-btn {
+.aprovar-btn {
 	margin-top: 15px;
-	margin-left: 15px;
+	margin-right: 15px;
 	padding: 10px 20px;
 	background-color: #4caf50;
 	color: white;
@@ -146,6 +147,27 @@ main h2 {
 	font-weight: bold;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
+}
+
+.aprovar-btn:hover {
+	background-color: #48ca4e;
+}
+
+.confirmar-btn {
+	margin-top: 15px;
+	margin-right: 15px;
+	padding: 10px 20px;
+	background-color: #120fdf;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.confirmar-btn:hover {
+	background-color: #08087a;
 }
 
 .tabs {
