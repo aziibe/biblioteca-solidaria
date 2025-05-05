@@ -20,9 +20,24 @@
   </header>
 
   <main>
-    <h2>Minhas Solicitações</h2>
+    <h2>Solicitações</h2>
     <!-- Contêiner vazio onde os cards serão adicionados dinamicamente -->
-    <div id="solicitacoes-container"></div>
+    <div id="solicitacoes-container">
+      <!-- Contêiner de guias -->
+      <div class="tabs">
+        <button class="tab-button active" data-tab="feitas">Solicitações Feitas</button>
+        <button class="tab-button" data-tab="recebidas">Solicitações Recebidas</button>
+      </div>
+
+      <!-- Contêiner das guias -->
+      <div id="feitas" class="tab-content active">
+        <div id="solicitacoes-feitas-container"></div>
+      </div>
+
+      <div id="recebidas" class="tab-content">
+        <div id="solicitacoes-recebidas-container"></div>
+      </div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
@@ -40,7 +55,11 @@
 
     const token = localStorage.getItem('accessToken');
 
-    async function carregarSolicitacoes() {
+    function filtrarSolicitacoesPorStatus(solicitacoes, statusPermitidos) {
+      return solicitacoes.filter(solicitacao => statusPermitidos.includes(solicitacao.status));
+    }
+
+    async function carregarSolicitacoesFeitas() {
       const response = await fetch('http://127.0.0.1:8000/api/book_requests/', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -48,8 +67,11 @@
       });
 
       const solicitacoes = await response.json();
-      const main = document.querySelector('main');
-      const solicitacoesFiltradas = solicitacoes.filter(solicitacao => solicitacao.status !== 'cancelled' && solicitacao.status !== 'delivered');
+      const container = document.getElementById('solicitacoes-feitas-container');
+      container.innerHTML = '';
+
+      const statusPermitidos = ['pending', 'awaiting_pickup'];
+      const solicitacoesFiltradas = filtrarSolicitacoesPorStatus(solicitacoes, statusPermitidos);
 
       solicitacoesFiltradas.forEach(solicitacao => {
         const card = document.createElement('div');
@@ -135,11 +157,55 @@
           card.appendChild(btnConfirmar);
         }
 
-        main.appendChild(card);
+        container.appendChild(card);
       });
     }
 
-    carregarSolicitacoes();
+    async function carregarSolicitacoesRecebidas() {
+      const response = await fetch('http://127.0.0.1:8000/api/donor-requests/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const solicitacoes = await response.json();
+      const container = document.getElementById('solicitacoes-recebidas-container');
+      container.innerHTML = '';
+
+      const statusPermitidos = ['pending', 'awaiting_pickup'];
+      const solicitacoesFiltradas = filtrarSolicitacoesPorStatus(solicitacoes, statusPermitidos);
+
+      solicitacoesFiltradas.forEach(solicitacao => {
+        const card = document.createElement('div');
+        card.classList.add('book-card');
+
+        const status = solicitacao.status;
+        const statusTraduzido = traduzirStatus(status);
+
+        card.innerHTML = `
+          <strong>Título:</strong> <span>${solicitacao.book.title}</span>
+          <strong>Solicitante:</strong> <span>${solicitacao.requester_name}</span>
+          <strong>Ponto de Retirada:</strong> <span>${solicitacao.pickup_point.name}</span>
+          <strong>Status:</strong> <span>${statusTraduzido}</span>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Alternar entre as guias
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      });
+    });
+
+    carregarSolicitacoesFeitas();
+    carregarSolicitacoesRecebidas();
 
     const btnSair = document.getElementById('btn-sair');
     btnSair.addEventListener('click', () => {
