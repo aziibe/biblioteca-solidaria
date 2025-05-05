@@ -27,6 +27,16 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
   <script>
+    function traduzirStatus(status) {
+      const traducoes = {
+        pending: 'Pendente',
+        awaiting_pickup: 'Aguardando Retirada',
+        cancelled: 'Cancelado',
+        delivered: 'Entregue'
+      };
+
+      return traducoes[status] || 'Desconhecido'; // Retorna "Desconhecido" se o status não for encontrado
+    }
 
     const token = localStorage.getItem('accessToken');
 
@@ -52,11 +62,13 @@
         else if (status === 'cancelled') card.classList.add('cancelado');
         else if (status === 'delivered') card.classList.add('entregue');
 
+        const statusTraduzido = traduzirStatus(status);
+
         card.innerHTML = `
         <strong>Título:</strong> <span>${solicitacao.book.title}</span>
         <strong>Doador:</strong> <span>${solicitacao.book.donated_by.name}</span>
         <strong>Contato:</strong> <span>${solicitacao.book.donated_by.email}</span>
-        <strong>Status:</strong> <span>${solicitacao.status}</span>
+        <strong>Status:</strong> <span>${statusTraduzido}</span>
       `;
 
         if (status === 'pending' || status === 'awaiting_pickup') {
