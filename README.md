@@ -190,13 +190,13 @@ Exibe:
 
 - Nome
 
--E-mail
+- E-mail
 
--Data de nascimento
+- Data de nascimento
 
--Telefone
+- Telefone
 
--Endereço completo
+- Endereço completo
 
 - Botão de atalho para editar perfil (editar-perfil.html).
 
